@@ -1,158 +1,273 @@
-![freeCodeCamp.org Social Banner](https://s3.amazonaws.com/freecodecamp/wide-social-banner.png)
+# S10 Configuration Tool
 
-[![Pull Requests Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
-[![first-timers-only Friendly](https://img.shields.io/badge/first--timers--only-friendly-blue.svg)](http://www.firsttimersonly.com/)
-[![Open Source Helpers](https://www.codetriage.com/freecodecamp/freecodecamp/badges/users.svg)](https://www.codetriage.com/freecodecamp/freecodecamp)
-[![Setup Automated](https://img.shields.io/badge/setup-automated-blue?logo=gitpod)](https://gitpod.io/from-referrer/)
+> GL S10 蓝牙快速配置工具
 
-## freeCodeCamp.org's open-source codebase and curriculum
+IDE: Visual Studio Code
 
-[freeCodeCamp.org](https://www.freecodecamp.org) is a friendly community where you can learn to code for free. It is run by a [donor-supported 501(c)(3) nonprofit](https://donate.freecodecamp.org) to help millions of busy adults transition into tech. Our community has already helped more than 10,000 people get their first developer job.
+框架：Google Flutter
 
-Our full-stack web development curriculum is completely free and self-paced. We have thousands of interactive coding challenges to help you expand your skills.
+开发语言：dart.js
 
-## Table of Contents
+- [运行](#运行)
+- [数据流](#数据流)
+- [指令码](#指令码)
+- [数据转义，解析](#数据转义，解析)
+- [指令下发](#指令下发)
+- [数据处理中心](#数据处理中心)
 
-- [Certifications](#certifications)
-- [The Learning Platform](#the-learning-platform)
-- [Reporting Bugs and Issues](#reporting-bugs-and-issues)
-- [Reporting Security Issues and Responsible Disclosure](#reporting-security-issues-and-responsible-disclosure)
-- [Contributing](#contributing)
-- [Platform, Build and Deployment Status](#platform-build-and-deployment-status)
-- [License](#license)
+### 运行
 
-### Certifications
+```bash
+# dev app
+flutter run
+```
 
-freeCodeCamp.org offers several free developer certifications. Each of these certifications involves building 5 required web app projects, along with hundreds of optional coding challenges to help you prepare for those projects. We estimate that each certification will take a beginner programmer around 300 hours to earn.
 
-Each of these 30 projects in the freeCodeCamp.org curriculum has its own agile user stories and automated tests. These help you build up your project incrementally and ensure you've fulfilled all the user stories before you submit it.
+### 数据流
 
-You can pull in these test suites through [freeCodeCamp's CDN](https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js). This means you can build these projects on websites like CodePen and Glitch - or even on your local computer's development environment.
+每当连接上一个蓝牙设备时，可以拿到设备的信息 **device**，监听 **device.state** 可以读取蓝牙实时上报的信息 **characteristic** 和特征值写入的方法 **cmdCharacteristic**
 
-Once you’ve earned a certification, you will always have it. You will always be able to link to it from your LinkedIn or résumé. And when your prospective employers or freelance clients click that link, they’ll see a verified certification specific to you.
+![Data Flow](assets/data_flow.png)
 
-The one exception to this is if we discover violations of our [Academic Honesty Policy](https://www.freecodecamp.org/academic-honesty). When we catch people unambiguously plagiarizing (submitting other people's code or projects as their own without citation), we do what all rigorous institutions of learning should do - we revoke their certifications and ban those people.
+### 指令码
+```dart
+const START_CODE = 0xFE;
+const VERSION = 0x01;
 
-Here are our six core certifications:
+const SET_WIFI_CONFIG = 0x01;
+const START_WIFI = 0x02;
+const STOP_WIFI = 0x03;
+const RESTART_WIFI = 0x04;
+const GET_NETWORK_STATE = 0x05;
+const CLEAR_WIFI_CONFIG = 0x06;
+const SET_MQTT_URI = 0x65;
+const START_MQTT = 0x66;
+const STOP_MQTT = 0x67;
+const RESTART_MQTT = 0x68;
+const GET_MQTT_CONFIG = 0x69;
+const CLEAR_MQTT_CONFIG = 0x6A;
+const MQTT_SUBSCRIBE = 0x6B;
+const MQTT_UNSUBSCRIBE = 0x6C;
+const MQTT_PUBLISH = 0x6D;
+const MQTT_SUBSCRIBE_MSG = 0x6E;
 
-#### 1. Responsive Web Design Certification
+const GET_VERSION = 0xF0;
+const SET_OTA_URL = 0xF1;
+const GET_STA_OTA = 0xF2;
+```
 
-- [Basic HTML and HTML5](https://learn.freecodecamp.org/responsive-web-design/basic-html-and-html5)
-- [Basic CSS](https://learn.freecodecamp.org/responsive-web-design/basic-css)
-- [Applied Visual Design](https://learn.freecodecamp.org/responsive-web-design/applied-visual-design)
-- [Applied Accessibility](https://learn.freecodecamp.org/responsive-web-design/applied-accessibility)
-- [Responsive Web Design Principles](https://learn.freecodecamp.org/responsive-web-design/responsive-web-design-principles)
-- [CSS Flexbox](https://learn.freecodecamp.org/responsive-web-design/css-flexbox)
-- [CSS Grid](https://learn.freecodecamp.org/responsive-web-design/css-grid)
-  <br />
-  <br />
-  **Projects**: Tribute Page, Survey Form, Product Landing Page, Technical Documentation Page, Personal Portfolio Webpage
+### 数据转义，解析
 
-#### 2. JavaScript Algorithms and Data Structures Certification
+所有数据解析的方法都封装在 **Util类** 中
 
-- [Basic JavaScript](https://learn.freecodecamp.org/javascript-algorithms-and-data-structures/basic-javascript)
-- [ES6](https://learn.freecodecamp.org/javascript-algorithms-and-data-structures/es6)
-- [Regular Expressions](https://learn.freecodecamp.org/javascript-algorithms-and-data-structures/regular-expressions)
-- [Debugging](https://learn.freecodecamp.org/javascript-algorithms-and-data-structures/debugging)
-- [Basic Data Structures](https://learn.freecodecamp.org/javascript-algorithms-and-data-structures/basic-data-structures)
-- [Algorithm Scripting](https://learn.freecodecamp.org/javascript-algorithms-and-data-structures/basic-algorithm-scripting)
-- [Object-Oriented Programming](https://learn.freecodecamp.org/javascript-algorithms-and-data-structures/object-oriented-programming)
-- [Functional Programming](https://learn.freecodecamp.org/javascript-algorithms-and-data-structures/functional-programming)
-- [Intermediate Algorithm Scripting](https://learn.freecodecamp.org/javascript-algorithms-and-data-structures/intermediate-algorithm-scripting)
-  <br />
-  <br />
-  **Projects**: Palindrome Checker, Roman Numeral Converter, Caesar's Cipher, Telephone Number Validator, Cash Register
+- 蓝牙上报信息解析
 
-#### 3. Front End Libraries Certification
+  ```dart
+  static Map parseMessage(List<int> data) {
+    var back = Map();
+    if (data.length >= 5) {
+      var cmd = data[3];
+      if (data[0] != START_CODE) {
+        back['code'] = -3;
+        back['msg'] = 'start code error';
+        back['data'] = data;
+        return back;
+      }
+      if (((data[1] << 8) + data[2]) != data.length) {
+        back['code'] = -4;
+        back['msg'] = 'length error';
+        return back;
+      }
 
-- [Bootstrap](https://learn.freecodecamp.org/front-end-libraries/bootstrap)
-- [jQuery](https://learn.freecodecamp.org/front-end-libraries/jquery)
-- [Sass](https://learn.freecodecamp.org/front-end-libraries/sass)
-- [React](https://learn.freecodecamp.org/front-end-libraries/react)
-- [Redux](https://learn.freecodecamp.org/front-end-libraries/redux)
-- [React and Redux](https://learn.freecodecamp.org/front-end-libraries/react-and-redux)
-  <br />
-  <br />
-  **Projects**: Random Quote Machine, Markdown Previewer, Drum Machine, JavaScript Calculator, Pomodoro Clock
+      if (data.length == 5) {
+        if (data[4] == 0) {
+          back['code'] = 0;
+          back['msg'] = 'success';
+          back['cmd'] = cmd;
+          return back;
+        } else {
+          back['code'] = -1;
+          back['msg'] = 'failed';
+          back['cmd'] = cmd;
+          return back;
+        }
+      } else {
+        data = cmd == MQTT_SUBSCRIBE_MSG ? data.sublist(4) : data.sublist(5);
+        back['code'] = 0;
+        back['msg'] = 'success';
+        back['cmd'] = cmd;
+        back['data'] = utf8.decode(data).toString();
+        return back;
+      }
+    } else {
+      back['code'] = -2;
+      back['msg'] = 'length too short';
+      return back;
+    }
+  }
+  ```
 
-#### 4. Data Visualization Certification
+- 写入数据解析
 
-- [Data Visualization with D3](https://learn.freecodecamp.org/data-visualization/data-visualization-with-d3)
-- [JSON APIs and Ajax](https://learn.freecodecamp.org/data-visualization/json-apis-and-ajax)
-  <br />
-  <br />
-  **Projects**: Bar Chart, Scatterplot Graph, Heat Map, Choropleth Map, Treemap Diagram
+  ```dart
+  static List<int> buildMessage(int cmdID, String msg) {
+    List<int> tmp = List();
+    tmp.add(START_CODE);
+    int len = msg.length + 4;
+    tmp.add((len >> 8) & 0xff);
+    tmp.add(len & 0xff);
+    tmp.add(cmdID);
+    tmp.addAll(utf8.encode(msg));
+    return tmp;
+  }
+  ```
+### 指令下发
 
-#### 5. APIs and Microservices Certification
 
-- [Managing Packages with Npm](https://learn.freecodecamp.org/apis-and-microservices/managing-packages-with-npm)
-- [Basic Node and Express](https://learn.freecodecamp.org/apis-and-microservices/basic-node-and-express)
-- [MongoDB and Mongoose](https://learn.freecodecamp.org/apis-and-microservices/mongodb-and-mongoose)
-  <br />
-  <br />
-  **Projects**: Timestamp Microservice, Request Header Parser, URL Shortener, Exercise Tracker, File Metadata Microservice
+```dart
+示例:
 
-#### 6. Information Security and Quality Assurance Certification
+/// 传入指令码，消息参数
+cmdCharacteristic.write(Util.buildMessage(0x01, "${_ssid.text}@${_password.text}"))
+```
 
-- [Information Security with HelmetJS](https://learn.freecodecamp.org/information-security-and-quality-assurance/information-security-with-helmetjs)
-- [Quality Assurance and Testing with Chai](https://learn.freecodecamp.org/information-security-and-quality-assurance/quality-assurance-and-testing-with-chai)
-- [Advanced Node and Express](https://learn.freecodecamp.org/information-security-and-quality-assurance/advanced-node-and-express)
-  <br />
-  <br />
-  **Projects**: Metric-Imperial Converter, Issue Tracker, Personal Library, Stock Price Checker, Anonymous Message Board
+1. 特征值写入方法：`cmdCharacteristic.write()`
+2. 传入 **指令码** 并**解析参数**：`Util.buildMessage(0x01, "ssid@psw")`
 
-#### Full Stack Development Certification
+##### 1.设置 WiFi
 
-Once you have earned all 6 of these certifications, you'll be able to claim your freeCodeCamp.org Full Stack Development Certification. This final distinction signifies that you’ve completed around 1,800 hours of coding with a wide range of web development tools.
+> 参数格式：`ssid@password`
 
-#### Legacy Certifications
+```dart
+cmdCharacteristic.write(Util.buildMessage(SET_WIFI_CONFIG, "${_ssid.text}@${_password.text}"));
+```
 
-We also have 3 legacy certifications from our 2015 curriculum, which are still available. All of the required projects for these legacy certifications will remain available on freeCodeCamp.org.
+##### 2.设置 Mqtt
 
-- Legacy Front End Development Certification
-- Legacy Data Visualization Certification
-- Legacy Back End Development Certification
+> 参数格式：`mqtt://username:password@host:port`
 
-### The Learning Platform
+```dart
+cmdCharacteristic.write(Util.buildMessage(SET_MQTT_URI, "mqtt://${_username.text}:${_password.text}@${_host.text}:${_port.text}"));
+```
 
-This code is running live at [freeCodeCamp.org](https://www.freecodecamp.org).
+##### 3.设置 OTA url
 
-Our community also has:
+> 参数格式：`0@url`
 
-- A [forum](https://www.freecodecamp.org/forum) where you can usually get programming help or project feedback within hours.
-- A [YouTube channel](https://youtube.com/freecodecamp) with free courses on Python, SQL, Android, and a wide variety of other technologies.
-- A [podcast](https://podcast.freecodecamp.org/) with technology insights and inspiring stories from developers.
-- A [Developer News](https://www.freecodecamp.org/news) publication, a free, open source, no-ads place to cross-post your blog articles.
+```dart
+cmdCharacteristic.write(Util.buildMessage(SET_OTA_URL, '0@${_ota.text}'));
+```
 
-> #### [Join our community here](https://www.freecodecamp.org/signin).
+##### 4.Mqtt 订阅
+- 发布
+- 订阅
+- 取消订阅
+- 消息通知
+```dart
 
-### Reporting Bugs and Issues
+/// 发布
+cmdCharacteristic.write(Util.buildMessage(MQTT_PUBLISH, "${_publishQos.text}@${_publishTopic.text}@${_publishMessage.text}"))
 
-If you think you've found a bug, first read the [how to report a bug](https://www.freecodecamp.org/forum/t/how-to-report-a-bug/19543) article and follow its instructions.
+/// 订阅
+cmdCharacteristic.write(Util.buildMessage(MQTT_SUBSCRIBE, "${_subscribeQos.text}@${_subscribeTopic.text}"));
 
-If you're confident it's a new bug and have confirmed that someone else is facing the same issue, go ahead and create a new GitHub issue. Be sure to include as much information as possible so we can reproduce the bug.
+/// 取消订阅
+cmdCharacteristic.write(Util.buildMessage(MQTT_UNSUBSCRIBE, "${_unsubscribeTopic.text}"))
 
-### Reporting Security Issues and Responsible Disclosure
+```
 
-If you think you have found a vulnerability, _please report responsibly_. Don't create GitHub issues for security issues. Instead, please send an email to `security@freecodecamp.org` and we'll look into it immediately.
+注意：**上面的指令下发后，所有响应的操作都在数据处理中心处理**
 
-We appreciate any responsible disclosure of vulnerabilities that might impact the integrity of our platforms and users. While we do not offer any bounties or swags at the moment, we'll be happy to list your name in our [Hall of Fame](HoF.md) for security researchers.
+### 数据处理中心
 
-### Contributing
+指令下发处理 + loading销毁 + 实时消息分发
 
-The freeCodeCamp.org community is possible thanks to thousands of kind volunteers like you. We welcome any and all contributions to the community and are excited to welcome you aboard.
+```dart
+if (data['code'] == 0) {
+  bool isAction =
+      Provider.of<BlueToothData>(context, listen: false)
+          .isAction;
+  switch (data['cmd']) {
 
-> #### [Please follow these steps to contribute](https://contribute.freecodecamp.org).
+    /// -----------> 实时消息更新 <-----------
 
-### Platform, Build and Deployment Status
+    case GET_NETWORK_STATE: /// [get wifi status]
+      Provider.of<BlueToothData>(context, listen: false)
+          .updateWifiData(data['data'].toString().split('@'));
+      break;
+    case GET_MQTT_CONFIG: /// [get mqtt config]
+      Provider.of<BlueToothData>(context, listen: false)
+          .updateMqttData(data['data'].toString().split('@'));
+      break;
+    case GET_VERSION: /// [get version]
+      Provider.of<BlueToothData>(context, listen: false)
+          .updateVersion(data['data'].toString());
+      break;
+    case MQTT_SUBSCRIBE_MSG: /// [get mqtt subscribe message]
+      print('MQTT_SUBSCRIBE_MSG');
+      Provider.of<BlueToothData>(context, listen: false)
+          .updateTimer();
+      Provider.of<BlueToothData>(context, listen: false)
+          .updateNotifyMessage(
+              data['data'].toString().split('@'));
+      break;
+    case GET_STA_OTA: /// [get ota status]
+      Provider.of<BlueToothData>(context, listen: false)
+          .updateUpgradeStatus('upgraded');
 
-The general platform status for all our applications is available at [`status.freecodecamp.org`](https://status.freecodecamp.org). The build and deployment status for the code is available in [our DevOps Guide](/docs/devops.md).
+      Future.delayed(Duration(seconds: 5), () {
+        if (_isConnenct) widget.device.disconnect();
+        FlutterBlue.instance
+            .startScan(timeout: Duration(seconds: 4));
+        Provider.of<BlueToothData>(context, listen: false)
+            .clear();
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext buildContext) =>
+                ScanDevice(),
+          ),
+          (route) => false,
+        );
+      });
+      break;
 
-### License
 
-Copyright © 2020 freeCodeCamp.org
+    /// -----------> loading销毁 + 指令下发处理 <-----------
+    
+    case SET_OTA_URL: /// [set ota url]
+      if (isAction) {
+        BotToast.closeAllLoading();
+        Provider.of<BlueToothData>(context, listen: false)
+            .updateUpgradeStatus('upgrading');
+        Provider.of<BlueToothData>(context, listen: false)
+            .updateAction(false);
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => Upgrade()));
+      }
+      print('SET_OTA_URL');
+      break;
+    case MQTT_PUBLISH: /// [set mqtt]
+    case MQTT_SUBSCRIBE:
+    case MQTT_UNSUBSCRIBE:
+      print('MQTT ACTIVE');
+      if (isAction) {
+        BotToast.closeAllLoading();
+        GLToast.message();
+        Provider.of<BlueToothData>(context, listen: false)
+            .updateAction(false);
+      }
+      break;
+  }
+} else {
+  if (data['cmd'] == GET_STA_OTA) {
+    print('GET_STA_OTA FAILED');
+    Provider.of<BlueToothData>(context, listen: false)
+        .updateUpgradeStatus('upgradeFailed');
+  }
+}
 
-The content of this repository is bound by the following licenses:
+```
 
-- The computer software is licensed under the [BSD-3-Clause](LICENSE.md) license.
-- The learning resources in the [`/curriculum`](/curriculum) directory including their subdirectories thereon are licensed under the [CC-BY-SA-4.0](/curriculum/LICENSE.md) license.
+
+
